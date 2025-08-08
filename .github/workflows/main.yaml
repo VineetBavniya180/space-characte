@@ -39,5 +39,5 @@ jobs:
       
       - name : checkout status 
         run: |
-          curl -q --head -I http://localhost:3000 | grep "200 OK" || (echo "Application is not running" && exit 1)
+          curl --head http://localhost:3000 | grep "200 OK" || (echo "Application is not running" && exit 1)
           echo "Application is running successfully" 
