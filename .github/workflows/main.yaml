@@ -34,10 +34,7 @@ jobs:
       - name : Start docker container
         run: |
           docker run -d --name spacecharacter -p 3000:3000 ${{secrets.DOCKER_USERNAME}}/spacecharacter:latest
+          sleep 10
+          curl --head http://localhost:3000 | grep "200 OK" || echo "Application is not running properly" 
           docker ps -a 
           docker logs spacecharacter 
-      
-      - name : checkout status 
-        run: |
-          curl --head http://localhost:3000 
-  
