@@ -1,38 +1,111 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+/* Full-screen starfield background */
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background: radial-gradient(ellipse at bottom, #0d1b2a 0%, #000 100%);
+  overflow-x: hidden;
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+/* Twinkling stars animation */
+.stars-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  z-index: -1;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.stars-bg::before, 
+.stars-bg::after {
+  content: "";
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  background: transparent url("https://www.transparenttextures.com/patterns/stardust.png") repeat;
+  animation: drift 100s linear infinite;
+  opacity: 0.5;
+}
+
+.stars-bg::after {
+  animation: drift 150s linear infinite reverse;
+}
+
+@keyframes drift {
+  from { transform: translate(0, 0); }
+  to { transform: translate(-50%, -50%); }
+}
+
+/* Main container */
+.container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-top: 5rem;
+  gap: 1.5rem;
+}
+
+/* Title Styling */
+.title {
+  font-size: 3rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #56ccf2, #bb6bd9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: fadeInDown 1.5s ease-in-out;
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Floating anime image */
+.main-image {
+  max-width: 300px;
+  border-radius: 50%;
+  box-shadow: 0 0 25px rgba(255, 105, 180, 0.8);
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+}
+
+/* Description */
+.description {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  max-width: 600px;
+  opacity: 0.85;
+  animation: fadeInUp 1.5s ease-in-out;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Button */
+.cta {
+  padding: 12px 28px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 25px;
+  background: linear-gradient(90deg, #ff6b6b, #ff8e53);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s ease;
+  box-shadow: 0 0 15px rgba(255, 105, 97, 0.6);
+}
+
+.cta:hover {
+  box-shadow: 0 0 25px rgba(255, 105, 97, 1);
+  transform: scale(1.05);
 }
