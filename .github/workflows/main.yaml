@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+      - dev 
+      - test 
   workflow_dispatch: 
 
 
@@ -16,7 +18,17 @@ jobs:
       
       - name: Set up Docker Image 
         run: |
-          docker build -t ${{secrets.DOCKER_USERNAME}}/spacecharacter:latest .
+          echo "Building Docker image for branch: ${{ github.ref_name }}"
+          if [ "${{ github.ref_name }}" == "main" ]; then
+            docker tag ${{secrets.DOCKER_USERNAME}}/spacecharacter:latest ${{secrets.DOCKER_USERNAME}}/spacecharacter:latest
+          elif [ "${{ github.ref_name }}" == "dev" ]; then
+            docker tag ${{secrets.DOCKER_USERNAME}}/spacecharacter:latest ${{secrets.DOCKER_USERNAME}}/spacecharacter:dev
+          elif [ "${{ github.ref_name }}" == "test" ]; then
+            docker tag ${{secrets.DOCKER_USERNAME}}/spacecharacter:latest ${{secrets.DOCKER_USERNAME}}/spacecharacter:test
+          else
+            echo "No specific tag for branch: ${{ github.ref_name }}"
+            
+          fi
       
       - name: Login to Docker Hub
         run: |
@@ -24,7 +36,15 @@ jobs:
       
       - name: Push Docker Image
         run: |
-          docker push ${{secrets.DOCKER_USERNAME}}/spacecharacter:latest
+          if [ "${{ github.ref_name }}" == "main" ]; then
+            docker push ${{secrets.DOCKER_USERNAME}}/spacecharacter:latest
+          elif [ "${{ github.ref_name }}" == "dev" ]; then
+            docker push ${{secrets.DOCKER_USERNAME}}/spacecharacter:dev
+          elif [ "${{ github.ref_name }}" == "test" ]; then
+            docker push ${{secrets.DOCKER_USERNAME}}/spacecharacter:test
+          else
+            echo "No specific tag for branch: ${{ github.ref_name }}"
+          fi
       
       - name: Logout from Docker Hub
         run: |
@@ -33,8 +53,30 @@ jobs:
         
       - name : Start docker container
         run: |
-          docker run -d --name spacecharacter -p 3000:3000 ${{secrets.DOCKER_USERNAME}}/spacecharacter:latest
+          if [ ${{github.ref_name}} == "main" ]; then
+            docker run -d --name spacecharacter -p 3000:3000 ${{secrets.DOCKER_USERNAME}}/spacecharacter:latest
+          elif [ ${{github.ref_name}} == "dev" ]; then
+            docker run -d --name spacecharacter-dev -p 9001:3000 ${{secrets.DOCKER_USERNAME}}/spacecharacter:dev
+          elif [ ${{github.ref_name}} == "test" ]; then
+            docker run -d --name spacecharacter-test -p 8001:3000 ${{secrets.DOCKER_USERNAME}}/spacecharacter:test
+          else
+            echo "No specific tag for branch: ${{ github.ref_name }}"
+          fi
+
           sleep 10
-          curl --head http://localhost:3000 | grep "200 OK" || echo "Application is not running properly" 
+          # Check if the application is running properly 
+          if [ ${{github.ref_name}} == "main" ]; then
+            curl --head http://localhost:3000 | grep "200 OK" || echo "Application is not running properly" 
+          elif [ ${{github.ref_name}} == "dev" ]; then
+            curl --head http://localhost:9001 | grep "200 OK" || echo "Application is not running properly" 
+          elif [ ${{github.ref_name}} == "test" ]; then
+            curl --head http://localhost:8001 | grep "200 OK" || echo "Application is not running properly" 
+          fi
+          # Display the status of the Docker container
           docker ps -a 
-          docker logs spacecharacter 
+          # Display the logs of the Docker container 
+          if [ ${{github.ref_name}} == "main" ]; then
+            docker logs spacecharacter || echo "No logs available for the container"
+          else 
+            docker logs $(docker ps -q --filter "name=${{github.ref_name}}") || echo "No logs available for the container"
+          fi
