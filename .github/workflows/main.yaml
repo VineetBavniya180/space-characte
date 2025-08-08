@@ -6,9 +6,6 @@ on:
       - main
   workflow_dispatch: 
 
-environment: 
-  username: ${{ secrets.DOCKER_USERNAME }}
-  password: ${{ secrets.DOCKER_PASSWORD }} 
 
 jobs: 
   Deploy:
