@@ -10,6 +10,8 @@ RUN npm install
 
 COPY . .
 
+RUN chown -R app:app /app
+
 USER app 
 
 EXPOSE 3000
