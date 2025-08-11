@@ -64,5 +64,4 @@ jobs:
           port: ${{ secrets.EC2_PORT }}
 
           scripts: |
-            echo "created file from github actions" > ~/deploy.txt
-            ls -la ~ 
+            echo "created file from github actions" > /home/ubuntu/deploy.txt
