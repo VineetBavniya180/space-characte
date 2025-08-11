@@ -65,3 +65,4 @@ jobs:
 
           scripts: |
             echo "created file from github actions" > ~/deploy.txt
+            ls -la ~ 
