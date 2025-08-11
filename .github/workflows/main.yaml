@@ -8,9 +8,13 @@ on:
       - test 
   workflow_dispatch: 
 
+permissions: 
+  contents: read
+  id-token: write 
+
 
 jobs: 
-  Deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -51,32 +55,58 @@ jobs:
           docker logout ${{ secrets.DOCKER_USERNAME }} 
           docker logout
         
-      - name : Start docker container
-        run: |
-          if [ ${{github.ref_name}} == "main" ]; then
-            docker run -d --name spacecharacter -p 3000:3000 ${{secrets.DOCKER_USERNAME}}/spacecharacter:latest
-          elif [ ${{github.ref_name}} == "dev" ]; then
-            docker run -d --name spacecharacter-dev -p 9001:3000 ${{secrets.DOCKER_USERNAME}}/spacecharacter:dev
-          elif [ ${{github.ref_name}} == "test" ]; then
-            docker run -d --name spacecharacter-test -p 8001:3000 ${{secrets.DOCKER_USERNAME}}/spacecharacter:test
-          else
-            echo "No specific tag for branch: ${{ github.ref_name }}"
-          fi
+      # - name : Start docker container
+      #   run: |
+      #     if [ ${{github.ref_name}} == "main" ]; then
+      #       docker run -d --name spacecharacter -p 3000:3000 ${{secrets.DOCKER_USERNAME}}/spacecharacter:latest
+      #     elif [ ${{github.ref_name}} == "dev" ]; then
+      #       docker run -d --name spacecharacter-dev -p 9001:3000 ${{secrets.DOCKER_USERNAME}}/spacecharacter:dev
+      #     elif [ ${{github.ref_name}} == "test" ]; then
+      #       docker run -d --name spacecharacter-test -p 8001:3000 ${{secrets.DOCKER_USERNAME}}/spacecharacter:test
+      #     else
+      #       echo "No specific tag for branch: ${{ github.ref_name }}"
+      #     fi
 
-          sleep 10
-          # Check if the application is running properly 
-          if [ ${{github.ref_name}} == "main" ]; then
-            curl --head http://localhost:3000 | grep "200 OK" || echo "Application is not running properly" 
-          elif [ ${{github.ref_name}} == "dev" ]; then
-            curl --head http://localhost:9001 | grep "200 OK" || echo "Application is not running properly" 
-          elif [ ${{github.ref_name}} == "test" ]; then
-            curl --head http://localhost:8001 | grep "200 OK" || echo "Application is not running properly" 
-          fi
-          # Display the status of the Docker container
-          docker ps -a 
-          # Display the logs of the Docker container 
-          if [ ${{github.ref_name}} == "main" ]; then
-            docker logs spacecharacter || echo "No logs available for the container"
-          else 
-            docker logs $(docker ps -q --filter "name=${{github.ref_name}}") || echo "No logs available for the container"
-          fi
+      #     sleep 10
+      #     # Check if the application is running properly 
+      #     if [ ${{github.ref_name}} == "main" ]; then
+      #       curl --head http://localhost:3000 | grep "200 OK" || echo "Application is not running properly" 
+      #     elif [ ${{github.ref_name}} == "dev" ]; then
+      #       curl --head http://localhost:9001 | grep "200 OK" || echo "Application is not running properly" 
+      #     elif [ ${{github.ref_name}} == "test" ]; then
+      #       curl --head http://localhost:8001 | grep "200 OK" || echo "Application is not running properly" 
+      #     fi
+      #     # Display the status of the Docker container
+      #     docker ps -a 
+      #     # Display the logs of the Docker container 
+      #     if [ ${{github.ref_name}} == "main" ]; then
+      #       docker logs spacecharacter || echo "No logs available for the container"
+      #     else 
+      #       docker logs $(docker ps -q --filter "name=${{github.ref_name}}") || echo "No logs available for the container"
+      #     fi
+
+
+jobs:
+  Deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: {{ secret.AWS_ROLE_ARN }}
+          aws-region: {{ secrets.AWS_REGION }}
+
+      - name: Run EC2 Command via AWS SSM
+        uses: thomasvjoseph/aws-ssm-send@v1.0.0
+        with:
+          instance-id: {{ secrets.INSTANCE_ID }}
+          region: {{ secrets.AWS_REGION }}
+          commands: |
+            echo "Hello from GitHub Actions!"
+            echo "Creating a file..."
+            echo "Hello from GitHub Actions!" > ~/hello.txt
+            echo "File created successfully!"
+      
