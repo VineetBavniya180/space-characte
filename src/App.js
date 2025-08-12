@@ -6,7 +6,7 @@ function App() {
     <>
       <div className="stars-bg"></div>
         <div className="container">
-          <h1 className="title">Drifting Among the Stars Welcome To The main Branch </h1>
+          <h1 className="title">Drifting Among the Stars Welcome To The main Branch One </h1>
 
           <img
             src={spaceImage}
