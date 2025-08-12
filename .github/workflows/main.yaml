@@ -65,7 +65,7 @@ jobs:
             docker pull ${{secrets.DOCKER_USERNAME}}/spacecharacter:latest || true
             docker stop spacecharacter || true
             docker rm spacecharacter || true
-            docker run -d --name spacecharacter -p 3000:3000 ${{secrets.DOCKER_USERNAME}}/spacecharacter:${{ github.ref_name }} || true
+            docker run -d --name spacecharacter -p 3000:3000 ${{secrets.DOCKER_USERNAME}}/spacecharacter:latest || true
             "
 
 
