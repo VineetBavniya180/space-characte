@@ -56,7 +56,7 @@ jobs:
           docker logout
 
       - name: SSH into EC2 and deploy
-        uses: appleboy/ssh-action@v1.0.0
+        uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
@@ -64,4 +64,5 @@ jobs:
           port: ${{ secrets.EC2_PORT }}
 
           scripts: |
-            docker run -d -p 3000:3000 ${{secrets.DOCKER_USERNAME}}/spacecharacter:test
+           whoami  
+
