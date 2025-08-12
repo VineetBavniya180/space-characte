@@ -62,7 +62,7 @@ jobs:
       
       - name: SSH into server
         run: ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} -p ${{ secrets.EC2_PORT }} "
-            BRANCH='${{ github.ref_name }}'
+            BRANCH='${{ github.ref_name }}';
             if [ \"\$BRANCH\" = \"main\" ]; then
               docker pull ${{secrets.DOCKER_USERNAME}}/spacecharacter:latest
               docker stop spacecharacter || true
