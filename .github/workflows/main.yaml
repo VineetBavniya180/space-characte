@@ -79,7 +79,7 @@ jobs:
               docker rm spacecharacter-test || true
               docker run -d --name spacecharacter-test -p 3002:3000 ${{secrets.DOCKER_USERNAME}}/spacecharacter:test
             else
-              echo \"No specific deployment for branch: \$BRANCH\"
+              echo \"No specific deployment for branch \$BRANCH\"
             fi"
 
 
