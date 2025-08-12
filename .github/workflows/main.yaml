@@ -61,11 +61,18 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_KEY }}
       
       - name: SSH into server
-        run: ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} -p ${{ secrets.EC2_PORT }} "
-            docker pull ${{secrets.DOCKER_USERNAME}}/spacecharacter:latest || true
-            docker stop spacecharacter || true
-            docker rm spacecharacter || true
-            docker run -d --name spacecharacter -p 3000:3000 ${{secrets.DOCKER_USERNAME}}/spacecharacter:latest || exit 1
-            "
+        run: |
+            ssh -o StrictHostKeyChecking=no \
+                ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} \
+                -p ${{ secrets.EC2_PORT }} << 'EOF'
+              docker pull ${{secrets.DOCKER_USERNAME}}/spacecharacter:latest || true
+              docker stop spacecharacter || true
+              docker rm spacecharacter || true
+              docker run -d --name spacecharacter \
+                -p 3000:3000 \
+                ${{secrets.DOCKER_USERNAME}}/spacecharacter:latest || exit 1
+
+              docker logs spacecharacter
+            EOF
 
 
