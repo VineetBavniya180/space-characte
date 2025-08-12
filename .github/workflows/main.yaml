@@ -63,6 +63,6 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.EC2_PORT }}
 
-          script: whoami 
+          script: echo "SSH connection test successful"
           capture_stdout: true
 
