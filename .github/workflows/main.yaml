@@ -63,6 +63,6 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.EC2_PORT }}
 
-          script: |
-           whoami  
+          script: whoami 
+          capture_stdout: true
 
