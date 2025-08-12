@@ -61,6 +61,25 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_KEY }}
       
       - name: SSH into server
-        run: ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} -p ${{ secrets.EC2_PORT }} "echo 'SSH connection successful' > ~/hello.txt"
+        run: ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} -p ${{ secrets.EC2_PORT }} "
+            if [ github_ref == main ]; then
+              docker pull ${{secrets.DOCKER_USERNAME}}/spacecharacter:latest
+              docker stop spacecharacter || true
+              docker rm spacecharacter || true
+              docker run -d --name spacecharacter -p 3000:3000 ${{secrets.DOCKER_USERNAME}}/spacecharacter:latest
+            elif [ github_ref == dev ]; then
+              docker pull ${{secrets.DOCKER_USERNAME}}/spacecharacter:dev
+              docker stop spacecharacter-dev || true
+              docker rm spacecharacter-dev || true
+              docker run -d --name spacecharacter-dev -p 3001:3000 ${{secrets.DOCKER_USERNAME}}/spacecharacter:dev
+            elif [ github_ref == test ]; then
+              docker pull ${{secrets.DOCKER_USERNAME}}/spacecharacter:test
+              docker stop spacecharacter-test || true
+              docker rm spacecharacter-test || true
+              docker run -d --name spacecharacter-test -p 3002:3000 ${{secrets.DOCKER_USERNAME}}/spacecharacter:test
+            else
+              echo "No specific deployment for branch: ${{ github.ref_name }}"
+            fi
+          "
 
 
